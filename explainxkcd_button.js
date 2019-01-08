@@ -6,17 +6,28 @@
 // @include     https://www.xkcd.com/*
 // @version     1.1
 // @grant       none
-// @require http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // ==/UserScript==
 
-var storeButton = $("div#topLeft li > a:contains('Store')");
+// This regex extracts the number from the URL, and only returns a
+// match for valid pages on the site.
+let extractNumber = /^https?:\/\/(?:www\.)?xkcd.com\/(?:(\d*)\/?)?$/i;
+let match = extractNumber.exec(window.location);
 
-var extractNumber = /^https?:\/\/(?:www\.)?xkcd.com\/(?:(\d*)\/?)?$/i;
-var comicNumber = extractNumber.exec(window.location)[1];
+if (match) {
+  // Select the fourth button in the top-left div, which is the
+  // Store button.
+  let storeButton = document.querySelectorAll("div#topLeft li")[3];
+  let buttonHref = storeButton.firstChild;
 
-if (comicNumber) {
-  storeButton.html("<a href='https://explainxkcd.com/" + comicNumber + "/'>Explain</a>");
-} else {
-  storeButton.html("<a href='https://explainxkcd.com/'>Explain</a>");
+  // Extract the comic number from the match. If no number in the URL
+  // then this will be falsy, so we can easily handle that case.
+  let comicNumber = match[1];
+
+  if (comicNumber) {
+    buttonHref.href = "https://explainxkcd.com/" + comicNumber + "/";
+  } else {
+    buttonHref.href = "https://explainxkcd.com/";
+  }
+  
+  buttonHref.text = "Explain";
 }
-
